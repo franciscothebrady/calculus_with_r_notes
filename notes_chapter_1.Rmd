@@ -1,0 +1,195 @@
+---
+title: "Calculus with R Notes: Chapter 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Ch.1: Representing Mathematical Functions
+
+Calculus is mostly about math functions and operations performed on them. In order to do that within the context of a programming language, we need to be able to think through how to translate the concepts of mathematical functions and their operations into that language (`R`). 
+
+### 1.1: Numbers, quantities, and names  
+
+Inputs taken by functions and their subsequent outputs are not always numbers, sometimes they are __quantities__.  
+
+Examples:  
+-  money, speed, pressure, height: These quantities also have additional properties, sometimes called __dimensions__ -- (denomination/time/volume/**units**). 
+
+This book attempts to deal with real-world examples, and therefore must make use of these additional dimensions. Most computer languages do not account for this. In R, you can type: 
+
+```{r}
+x <- 7
+```
+
+This stores the quantity 7 under the name `x`, but you cannot do this: 
+
+```{r, results='asis', error=TRUE} 
+y <- 12 meters 
+```
+
+To address this, we can use the **name** of a defined quantity to remind us of it's dimension.  
+
+```{r} 
+income <- 7
+``` 
+
+This style of naming provides us more context for the quantity, apart from the actual value. This is a different approach from traditional mathematical notation. For most people versed in math, they may have encountered $x$ or $y$ or $\theta$, which have common definitions. This is not possible when translating these symbols into programmatic language, which is why the naming convention can be useful.  
+
+### 1.2: R-language functions  
+
+In R, functions are objects that take in one or more inputs to produce an output. __In R, everything you do involves a function, either explicitly or implicitly__. For example:  
+
+```{r} 
+exp
+```
+
+Functions can be created using the __function__ `function`. The script below creates a function that translates yearly income to daily income:  
+
+```{r} 
+as_daily_income <- function(yearly_income) {
+  yearly_income / 365
+}
+```
+  
+  
+The naming of the function is arbitrary, although as mentioned above, it is good practice to name objects in R that are easy to write and that contain helpful context about the function/object.  
+
+In the code above, after the `function` keyword there is a pair of parentheses within which is the name of the **input** to that function (`yearly_income`). Naming the input `yearly_income` reminds us what is appropriate to supply as an input into that function &mdash; this is more commonly called the __argument__.  
+
+After this part, within the curly braces ({}), is the **body** of the function. This portion of the function that contains the calculations that will be done by the function, taking the input and returning an output. In this case, the function divides `yearly_income` by 365 to return an (approximate) daily income.  
+
+Note: In R, the name given to an argument does not matter at all, as long as it is used consistently. 
+
+```{r} 
+# to demonstrate argument naming
+as_daily_income <- function(x) {
+  x / 365
+}
+```
+  
+Both of the two functions above will do the same thing &mdash; divide the input by 365 to return a daily income.  
+
+Functions can have more than one argument:  
+```{r} 
+# to demonstrate argument naming
+as_daily_income <- function(yearly_income, duration) {
+  yearly_income / duration
+}
+```
+
+In these cases, we have to provide __all__ the arguments within the function definition, if we do not, R will return an error message: 
+
+```{r, error=TRUE} 
+as_daily_income(60000)
+```
+
+If we supply both arguments: 
+```{r, error=TRUE} 
+as_daily_income(60000, 365)
+```
+
+This can be avoided if we give an argument a __default value__: 
+```{r} 
+as_daily_income <- function(yearly_income, duration = 365) {
+  yearly_income / duration
+}
+```
+ 
+When the second argument is not supplied, the function will use the default value:  
+```{r, error=TRUE} 
+as_daily_income(60000)
+```
+
+```{r, error=TRUE} 
+as_daily_income(60000, duration = 365)
+```
+
+What you need to know about a function in order to use it:  
+1.  What are the arguments to the function, and what do they stand for?  
+2.  What kind of thing is produced by the function?  
+3.  That the function works as advertised. 
+
+
+### 1.3: Literate use of arguments  
+
+Names of a function are arbitrary &mdash; selected by the programmer. If you wanted to calculate $100e^{-2.5}$:
+
+```{r}
+100 * exp(-2.5) 
+```
+Its likely that the `-2.5` is part of a calculation, such as how much of a drug is still in the body ten days after a dose of `100` mg was administered. It is good practice to be explicit about the meaning of each component in a calculation: 
+
+```{r}
+dose <- 100 # mg
+duration <- 10 # days
+time_constant <- 4 # days
+dose * exp( - duration / time_constant)
+```
+Putting this all together in a __function__ is even better, because it is extensible and does the calculation for you: 
+```{r}
+drug_remaining <- function(dose, duration, time_constant) {
+  dose * exp(- duration / time_constant)
+}
+```
+
+```{r}
+drug_remaining(dose = 100, duration = 10, time_constant = 4)
+```
+By specifying clear inputs, names, and arguments, you create clear and reproducible documentation of your functions. This allows someone else, including "future you", to be able to use and understand your code.  
+
+### 1.4: With Respect to...  
+
+Sop far we have used R functions to represent the calculation of quantities from inputs like the dose and time constant of a drug.  
+
+But in R, functions play a much bigger role &mdash; functions are used for everything from reading a file of data to drawing graphs and much more. What we are interested in is the use of functions to represent and implement the operations of calculus. The operations have names that you may or may not be familiar with: differentiation, integration, etc.  
+
+When a calculus or other math operation is being run, you have to specify which **variable** or input the operation is being done **with respect to**. To illustrate, we will use the `drug_remaining()` function to draw a graph of the graph of how much of a drug remains in the body, as a function of time.  
+
+`drug_remaining()` has three arguments: `dose`, `duration`, and `time_constant`. The graph we're going to draw sho'ws the drug remaining as a function of `duration`. That is, the operation of graphing will be __with respect to duration__. We can decide how long to model the `drug_remaining()` function.  
+
+In this book , we'll be using operations provided by the `mosaic` and `mosaicCalc` packages. These packages have a specific notation to express __with respect to__. That notation uses the tilde character `~`. Here's how to draw that graph:  
+
+```{r, message=FALSE, warning=FALSE}
+# run these lines only once, to install the packages
+# install.packages('mosaic')
+#devtools::install_github("ProjectMOSAIC/mosaicCalc", ref="beta")
+# load  the packages into your session
+library(mosaic)
+#library(mosaicCalc)
+```
+
+```{r}
+t <- 1:20
+dr <- drug_remaining(dose = 100, 
+                     4, duration = t)
+data <- dplyr::tibble(t = t, dr = dr)
+ggplot(data) + geom_line(aes(x = t, y = dr))
+
+# note: i had a real doozy of a time installing mosaic and mosaicCalc. 
+# In the end I was unable to install the function slice_plot(), 
+# which is how the chart is created in the book. Instead I recreated 
+# it using ggplot, which is what the package is using. 
+
+```
+  
+A more complete graph would be labelled, with "Time (days)" on the x-axis, and "Remaining drug (mg) on the vertical axis.   
+  
+    
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,30 @@
+---
+title: "Calculus with R Notes: Preface"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Preface
+
+This book shows how to do common calculus calculations using R.
+
+-  R is a language for communicating instructions to a computer.  
+-  R is associated with statistics, but not usually with calculus.  
+-  R is a **functional** computer language, meaning that it's easy to perform calculations __on__ functions.  
+-  R functions that carry out calculus are provided by the `mosaicCalc` package. 
+
+## Why?
+
+Three major reasons to get started with calculus in R:  
+-  In math and statistics, there are often multiple inputs to a computation.  -- R makes this easier
+-  The output of one computation often becomes the input of another.  -- R makes this easier  
+-  The end product is not the only thing of importance -- R makes this easier (to see this)
+
+### A common language 
+
+It's important that we can use a common language to express ideas. When traveling this becomes apparent. When thinking of computers, it's easy to think that computers should be taught English. However, English is not equiped to be effective at communicating math or statistical processes. **R makes this easier**  
+
+
